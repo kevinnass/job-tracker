@@ -1,12 +1,23 @@
 <template>
   <header class="sticky top-0 z-40 w-full border-b-2 border-primary bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
     <div class="max-w-7xl mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
-      <NuxtLink to="/" class="flex items-center gap-2">
-        <div class="h-6 w-6 rounded bg-primary flex items-center justify-center">
-          <span class="text-[10px] font-bold text-primary-foreground">JT</span>
-        </div>
-        <span class="text-sm font-bold tracking-tight text-foreground uppercase">JobTracker</span>
-      </NuxtLink>
+      <div class="flex items-center gap-6">
+        <NuxtLink to="/" class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded bg-primary flex items-center justify-center">
+            <span class="text-[10px] font-bold text-primary-foreground">JT</span>
+          </div>
+          <span class="text-sm font-bold tracking-tight text-foreground uppercase">JobTracker</span>
+        </NuxtLink>
+        
+        <nav v-if="user" class="hidden md:flex items-center gap-4">
+          <NuxtLink to="/" class="text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors" active-class="text-foreground">
+            Tableau de bord
+          </NuxtLink>
+          <NuxtLink to="/assistant" class="text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors" active-class="text-foreground">
+            Assistant IA
+          </NuxtLink>
+        </nav>
+      </div>
       
       <div class="flex items-center gap-4">
         <button 

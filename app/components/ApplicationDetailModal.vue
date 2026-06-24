@@ -58,8 +58,26 @@
             <div class="absolute bottom-0 left-7 right-7 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
           </div>
 
-          <!-- ═══════ SCROLLABLE CONTENT ═══════ -->
-          <div class="flex-1 overflow-y-auto px-7 py-6 space-y-7 scroll-smooth">
+          <!-- Tabs -->
+          <div class="flex border-b border-border/40 px-7 bg-muted/20">
+            <button 
+              @click="activeTab = 'details'"
+              class="py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all"
+              :class="activeTab === 'details' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+            >
+              📋 Détails
+            </button>
+            <button 
+              @click="activeTab = 'ia'"
+              class="py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-1.5"
+              :class="activeTab === 'ia' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+            >
+              ✨ Documents IA
+            </button>
+          </div>
+
+          <!-- ═══════ SCROLLABLE CONTENT (DETAILS) ═══════ -->
+          <div v-if="activeTab === 'details'" class="flex-1 overflow-y-auto px-7 py-6 space-y-7 scroll-smooth">
 
             <!-- ── Key metrics row ── -->
             <div class="grid grid-cols-3 gap-3">
@@ -143,6 +161,113 @@
 
           </div>
 
+          <!-- ═══════ AI CONTENT TAB ═══════ -->
+          <div v-else-if="activeTab === 'ia'" class="flex-1 overflow-y-auto px-7 py-6 space-y-6 scroll-smooth">
+            <div class="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15 space-y-1">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Générations Assistant IA</h3>
+              <p class="text-[11px] text-muted-foreground leading-relaxed">Retrouvez ici les lettres de motivation, relances et préparations d'entretiens générées et enregistrées pour cette offre depuis l'Assistant IA.</p>
+            </div>
+
+            <!-- Cover Letter Section -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.15em] text-foreground flex items-center gap-1.5">
+                  ✉️ Lettre de motivation
+                </h4>
+                <button 
+                  @click="generateWithAi('cover_letter')"
+                  class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-all flex items-center gap-1"
+                >
+                  {{ aiContents.cover_letter ? '🔄 Régénérer / Discuter' : '✨ Générer avec l\'IA' }}
+                </button>
+              </div>
+              <div v-if="aiContents.cover_letter" class="relative group">
+                <pre class="text-xs text-foreground/90 leading-relaxed bg-muted/50 border rounded-xl p-4 whitespace-pre-wrap font-sans max-h-60 overflow-y-auto">{{ aiContents.cover_letter }}</pre>
+                <div class="absolute top-2 right-2 flex gap-1 bg-card/85 backdrop-blur-sm rounded border border-border p-0.5 opacity-0 group-hover:opacity-100 transition-all shadow-sm">
+                  <button 
+                    @click="copyToClipboard(aiContents.cover_letter, 'cover_letter')" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {{ copiedSection === 'cover_letter' ? 'Copié !' : 'Copier' }}
+                  </button>
+                  <button 
+                    @click="printSingleMessage(aiContents.cover_letter, `Lettre de motivation — ${application.company_name}`)" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    PDF
+                  </button>
+                </div>
+              </div>
+              <p v-else class="text-xs text-muted-foreground italic pl-1">Aucune lettre de motivation enregistrée.</p>
+            </div>
+
+            <!-- Follow-up Section -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.15em] text-foreground flex items-center gap-1.5">
+                  📞 E-mail de relance
+                </h4>
+                <button 
+                  @click="generateWithAi('follow_up')"
+                  class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-all flex items-center gap-1"
+                >
+                  {{ aiContents.follow_up ? '🔄 Régénérer / Discuter' : '✨ Générer avec l\'IA' }}
+                </button>
+              </div>
+              <div v-if="aiContents.follow_up" class="relative group">
+                <pre class="text-xs text-foreground/90 leading-relaxed bg-muted/50 border rounded-xl p-4 whitespace-pre-wrap font-sans max-h-60 overflow-y-auto">{{ aiContents.follow_up }}</pre>
+                <div class="absolute top-2 right-2 flex gap-1 bg-card/85 backdrop-blur-sm rounded border border-border p-0.5 opacity-0 group-hover:opacity-100 transition-all shadow-sm">
+                  <button 
+                    @click="copyToClipboard(aiContents.follow_up, 'follow_up')" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {{ copiedSection === 'follow_up' ? 'Copié !' : 'Copier' }}
+                  </button>
+                  <button 
+                    @click="printSingleMessage(aiContents.follow_up, `E-mail de relance — ${application.company_name}`)" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    PDF
+                  </button>
+                </div>
+              </div>
+              <p v-else class="text-xs text-muted-foreground italic pl-1">Aucun e-mail de relance enregistré.</p>
+            </div>
+
+            <!-- Interview Prep Section -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.15em] text-foreground flex items-center gap-1.5">
+                  🤝 Préparation entretien
+                </h4>
+                <button 
+                  @click="generateWithAi('interview_prep')"
+                  class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 transition-all flex items-center gap-1"
+                >
+                  {{ aiContents.interview_prep ? '🔄 Régénérer / Discuter' : '✨ Générer avec l\'IA' }}
+                </button>
+              </div>
+              <div v-if="aiContents.interview_prep" class="relative group">
+                <div v-html="renderAiMarkdown(aiContents.interview_prep)" class="text-xs text-foreground/90 leading-relaxed bg-muted/50 border rounded-xl p-4 max-h-60 overflow-y-auto"></div>
+                <div class="absolute top-2 right-2 flex gap-1 bg-card/85 backdrop-blur-sm rounded border border-border p-0.5 opacity-0 group-hover:opacity-100 transition-all shadow-sm">
+                  <button 
+                    @click="copyToClipboard(aiContents.interview_prep, 'interview_prep')" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {{ copiedSection === 'interview_prep' ? 'Copié !' : 'Copier' }}
+                  </button>
+                  <button 
+                    @click="printSingleMessage(aiContents.interview_prep, `Préparation entretien — ${application.company_name}`)" 
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    PDF
+                  </button>
+                </div>
+              </div>
+              <p v-else class="text-xs text-muted-foreground italic pl-1">Aucune préparation d'entretien enregistrée.</p>
+            </div>
+          </div>
+
           <!-- ═══════ FOOTER ═══════ -->
           <div class="px-7 py-3 border-t border-border/30 bg-muted/10 flex justify-between items-center">
             <div class="h-0.5 w-8 rounded-full bg-gradient-to-r from-violet-500 via-sky-500 to-emerald-500 opacity-40" />
@@ -213,6 +338,143 @@ const parsedCompanyInfo = computed(() => {
   const parsed = parseJsonSafely(props.application.company_info)
   return typeof parsed === 'object' && parsed !== null ? parsed : null
 })
+
+// ─── AI Contents State & Fetching ───
+const supabase = useSupabaseClient()
+const router = useRouter()
+const activeTab = ref<'details' | 'ia'>('details')
+const aiContents = ref<{ cover_letter?: string; follow_up?: string; interview_prep?: string }>({})
+const copiedSection = ref<string | null>(null)
+
+async function fetchAiContents() {
+  try {
+    const { data, error } = await supabase
+      .from('ia_contents')
+      .select('content_type, content')
+      .eq('application_id', props.application.id)
+    
+    if (error) throw error
+    if (data) {
+      const mapped: any = {}
+      data.forEach(item => {
+        mapped[item.content_type] = item.content
+      })
+      aiContents.value = mapped
+    }
+  } catch (e) {
+    console.error('Failed to fetch AI contents:', e)
+  }
+}
+
+onMounted(() => {
+  fetchAiContents()
+})
+
+function copyToClipboard(text: string, section: string) {
+  if (!text) return
+  navigator.clipboard.writeText(text)
+  copiedSection.value = section
+  setTimeout(() => {
+    if (copiedSection.value === section) {
+      copiedSection.value = null
+    }
+  }, 2000)
+}
+
+function generateWithAi(type: 'cover_letter' | 'follow_up' | 'interview_prep') {
+  let shortcutType = ''
+  if (type === 'cover_letter') shortcutType = 'coverLetter'
+  else if (type === 'follow_up') shortcutType = 'followUp'
+  else if (type === 'interview_prep') shortcutType = 'interview'
+
+  router.push({
+    path: '/assistant',
+    query: {
+      appId: props.application.id,
+      generate: shortcutType
+    }
+  })
+}
+
+function printSingleMessage(content: string, title: string) {
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    return
+  }
+
+  const formattedHtml = renderAiMarkdown(content)
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${title}</title>
+        <meta charset="utf-8">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+          body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 40px;
+            color: #09090b;
+            background: #ffffff;
+            line-height: 1.6;
+            font-size: 13px;
+          }
+          h2, h3, h4, h5 {
+            font-weight: 700;
+            color: #4f46e5;
+            margin-top: 20px;
+            margin-bottom: 8px;
+          }
+          strong {
+            font-weight: 600;
+            color: #1e1b4b;
+          }
+          pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+          }
+          li {
+            margin-bottom: 6px;
+          }
+          @media print {
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 12px; margin-bottom: 24px;">
+          <h2 style="margin: 0; font-size: 18px; text-transform: uppercase; tracking: 0.5px;">JobTracker AI Document</h2>
+          <div style="font-size: 11px; color: #71717a; margin-top: 4px;">Rapport généré automatiquement</div>
+        </div>
+        <div>${formattedHtml}</div>
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 300);
+          }
+        <\/script>
+      </body>
+    </html>
+  `
+  printWindow.document.write(html)
+  printWindow.document.close()
+}
+
+function renderAiMarkdown(text: string): string {
+  if (!text) return ''
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  html = html.replace(/^###\s+(.*)$/gm, '<h5 class="text-xs font-bold mt-3 mb-1 text-indigo-600 dark:text-indigo-400">$1</h5>')
+  html = html.replace(/^##\s+(.*)$/gm, '<h4 class="text-xs font-bold mt-4 mb-1 text-foreground border-b pb-0.5">$1</h4>')
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-indigo-700 dark:text-indigo-300">$1</strong>')
+  html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<li class="ml-4 list-disc my-0.5">$1</li>')
+  html = html.replace(/\n/g, '<br>')
+  return html
+}
 
 // ─── Helpers ───
 function formatDate(date: string) {
