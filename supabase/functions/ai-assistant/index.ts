@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, context } = await req.json()
+    const { messages, context, userProfile } = await req.json()
 
     if (!API_KEY) {
       return new Response(JSON.stringify({ 
@@ -36,6 +36,29 @@ serve(async (req) => {
 
     // Build context system prompt
     let systemPrompt = "Tu es un assistant virtuel expert en recrutement et recherche d'emploi pour l'application JobTracker. Ton but est d'aider le candidat dans toutes ses démarches (rédaction de lettres de motivation, d'e-mails de relance, préparation aux questions d'entretiens d'embauche). Réponds en français de manière claire, concise, professionnelle et bien structurée en Markdown."
+
+    if (userProfile) {
+      const exp = Array.isArray(userProfile.experience) && userProfile.experience.length > 0
+        ? userProfile.experience.map((e: any) => `${e.title} chez ${e.company} (${e.start}–${e.end || 'Présent'}): ${e.description || ''}`).join('; ')
+        : '—'
+      const edu = Array.isArray(userProfile.education) && userProfile.education.length > 0
+        ? userProfile.education.map((e: any) => `${e.degree} — ${e.institution} (${e.year || ''})`).join('; ')
+        : '—'
+      const skills = Array.isArray(userProfile.skills) ? userProfile.skills.join(', ') : (userProfile.skills || '—')
+      const languages = Array.isArray(userProfile.languages) ? userProfile.languages.join(', ') : (userProfile.languages || '—')
+
+      systemPrompt += `\n\nVoici le profil personnel du candidat pour qui tu travailles :
+- **Nom complet** : ${userProfile.full_name || '—'}
+- **Titre actuel** : ${userProfile.job_title || '—'}
+- **Résumé professionnel** : ${userProfile.professional_summary || '—'}
+- **Compétences clés** : ${skills}
+- **Langues** : ${languages}
+- **Expériences** : ${exp}
+- **Formation** : ${edu}
+- **LinkedIn** : ${userProfile.linkedin_url || '—'}
+
+Utilise ces informations pour personnaliser tes réponses, notamment lors de la rédaction de lettres de motivation ou d'e-mails de relance. Adapte le ton et le contenu au profil du candidat.`
+    }
 
     if (context) {
       systemPrompt += `\n\nVoici le contexte de la candidature actuelle sélectionnée par le candidat :

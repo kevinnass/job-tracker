@@ -401,6 +401,7 @@ const useMock = ref(false)
 const messageContainer = ref<HTMLDivElement | null>(null)
 const copiedMessageIndex = ref<number | null>(null)
 const showDeleteConfirmModal = ref(false)
+const userProfile = ref<any | null>(null)
 
 interface Message {
   id?: string
@@ -445,10 +446,20 @@ watch(activeApp, () => {
   fetchChatHistory()
 }, { immediate: true })
 
-// Ensure applications list is ready
-onMounted(() => {
+// Ensure applications list is ready and fetch user profile
+onMounted(async () => {
   if (user.value) {
     store.fetchApplications()
+    // Fetch user profile to provide AI context
+    const userId = await getUserId()
+    if (userId) {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle()
+      userProfile.value = data || null
+    }
   }
 })
 
@@ -621,6 +632,7 @@ async function sendMessage() {
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
           messages: messages.value.map(m => ({ role: m.role, content: m.content })),
+          userProfile: userProfile.value || null,
           context: activeApp.value ? {
             company_name: activeApp.value.company_name,
             job_profile: activeApp.value.job_profile,
