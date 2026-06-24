@@ -32,7 +32,7 @@
           </button>
         </div>
         
-        <NuxtLink v-else to="/login" class="text-xs font-medium underline text-muted-foreground hover:text-foreground transition-colors">
+        <NuxtLink v-else-if="route.path !== '/login'" to="/login" class="text-xs font-medium underline text-muted-foreground hover:text-foreground transition-colors">
           Connexion
         </NuxtLink>
       </div>
@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 const showExtensionModal = ref(false)

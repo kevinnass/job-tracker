@@ -2,14 +2,14 @@
   <div class="w-full overflow-hidden">
     <!-- Desktop Table -->
     <div class="hidden lg:block overflow-x-auto">
-      <table class="w-full">
+      <table class="w-full table-fixed">
         <thead>
           <tr class="border-b-2 border-border/50">
             <th
               v-for="col in columns"
               :key="col.key"
               @click="toggleSort(col.key)"
-              class="h-11 px-5 text-left align-middle font-bold text-muted-foreground uppercase tracking-wider text-[11px] cursor-pointer hover:text-foreground transition-colors select-none"
+              class="h-11 px-4 text-left align-middle font-bold text-muted-foreground uppercase tracking-wider text-[11px] cursor-pointer hover:text-foreground transition-colors select-none w-[15%]"
             >
               <span class="flex items-center gap-1.5">
                 {{ col.label }}
@@ -19,7 +19,7 @@
                 </svg>
               </span>
             </th>
-            <th class="h-11 px-5 w-24"></th>
+            <th class="h-11 px-4 w-[10%]"></th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
             :class="index % 2 === 0 ? 'bg-transparent hover:bg-muted/40' : 'bg-muted/15 hover:bg-muted/40'"
           >
             <!-- Entreprise -->
-            <td class="px-5 py-4 align-middle">
+            <td class="px-4 py-4 align-middle">
               <div class="flex items-center gap-3">
                 <!-- Mini monogram -->
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-[10px] font-black" :class="getMonogramColor(app.status)">
@@ -50,13 +50,13 @@
               </div>
             </td>
             <!-- Missions -->
-            <td class="px-5 py-4 align-middle min-w-[250px] max-w-[350px] w-[30%]">
+            <td class="px-4 py-4 align-middle">
               <p class="text-[13px] text-foreground/90 leading-relaxed line-clamp-3">
                 {{ formatMissions(app.main_missions) }}
               </p>
             </td>
             <!-- Compétences -->
-            <td class="py-4 align-middle">
+            <td class="px-4 py-4 align-middle">
               <div v-if="app.primary_skills" class="flex flex-wrap items-center gap-1.5">
                 <span
                   v-for="skill in formatSkills(app.primary_skills).slice(0, 3)"
@@ -75,32 +75,32 @@
               <span v-else class="text-muted-foreground/40 text-xs">—</span>
             </td>
             <!-- Salaire -->
-            <td class="px-4 py-4 align-middle">
-              <div v-if="app.proposed_salary" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <td class="px-4 py-4 align-middle overflow-hidden">
+              <div v-if="app.proposed_salary" :title="formatProposedSalary(app.proposed_salary)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 max-w-[130px]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
                 </svg>
-                <span class="text-[12px] font-bold whitespace-nowrap">
+                <span class="text-[12px] font-bold truncate min-w-0">
                   {{ formatProposedSalary(app.proposed_salary) }}
                 </span>
               </div>
               <span v-else class="text-muted-foreground/40 text-xs">—</span>
             </td>
             <!-- Date -->
-            <td @click.stop class="px-5 py-4 align-middle whitespace-nowrap">
+            <td @click.stop class="px-4 py-4 align-middle whitespace-nowrap">
               <span class="text-[12px] font-medium text-foreground/60">
                 {{ app.applied_at ? formatDate(app.applied_at) : '—' }}
               </span>
             </td>
             <!-- Statut -->
-            <td @click.stop class="px-5 py-4 align-middle">
+            <td @click.stop class="px-4 py-4 align-middle">
               <StatusSelect
                 :model-value="app.status"
                 @change="(newStatus) => $emit('changeStatus', app.id, newStatus)"
               />
             </td>
             <!-- Actions -->
-            <td class="px-5 py-4 align-middle">
+            <td class="px-4 py-4 align-middle">
               <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button @click.stop="$emit('edit', app)" class="p-1.5 hover:bg-muted rounded-lg transition-colors" title="Modifier">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-muted-foreground hover:text-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

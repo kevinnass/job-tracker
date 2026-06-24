@@ -5,6 +5,14 @@
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <div class="flex items-center gap-2">
+          <button @click="showImportExportModal = true" class="btn-secondary flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exporter
+          </button>
           <button @click="handleAdd" class="btn-primary flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 5v14" /><path d="M5 12h14" />
@@ -166,6 +174,11 @@
       @cancel="applicationToDelete = null"
       @confirm="handleDelete"
     />
+
+    <ImportExportModal
+      v-if="showImportExportModal"
+      @close="showImportExportModal = false"
+    />
   </div>
 </template>
 
@@ -176,6 +189,7 @@ const store = useApplicationsStore()
 const searchQuery = ref('')
 const activeFilter = ref<string | null>(null)
 const showAddModal = ref(false)
+const showImportExportModal = ref(false)
 const editingApplication = ref<JobApplication | null>(null)
 const viewingApplication = ref<JobApplication | null>(null)
 const applicationToDelete = ref<JobApplication | null>(null)
