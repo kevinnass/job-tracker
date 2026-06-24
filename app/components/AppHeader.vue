@@ -9,21 +9,34 @@
           <span class="text-sm font-bold tracking-tight text-foreground uppercase">JobTracker</span>
         </NuxtLink>
         
-        <nav v-if="user" class="hidden md:flex items-center gap-1.5 p-1 bg-muted/40 rounded-full border border-border/50">
+        <nav v-if="user" class="hidden md:flex items-center gap-1 p-1 bg-muted/60 dark:bg-zinc-900/60 rounded-full border border-border/80 shadow-inner relative">
           <NuxtLink 
             to="/" 
-            class="text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-full transition-all duration-200 text-muted-foreground hover:text-foreground"
-            active-class="bg-background text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-500/10 font-bold"
-            exact-active-class="bg-background text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-500/10 font-bold"
+            class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 relative group"
+            active-class="bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-border/40 font-bold"
+            exact-active-class="bg-background dark:bg-zinc-900 border-2 border-green-600 text-foreground dark:text-zinc-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-border/40 font-bold"
           >
-            Tableau de bord
+            <span class="absolute inset-0 rounded-full bg-indigo-500/0 group-hover:bg-indigo-500/5 dark:group-hover:bg-indigo-400/5 transition-all duration-300 -z-10"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-muted-foreground group-[.router-link-active]:text-indigo-500 dark:group-[.router-link-active]:text-indigo-400 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9" rx="1" />
+              <rect x="14" y="3" width="7" height="5" rx="1" />
+              <rect x="14" y="12" width="7" height="9" rx="1" />
+              <rect x="3" y="16" width="7" height="5" rx="1" />
+            </svg>
+            <span class="text-muted-foreground group-[.router-link-active]:text-foreground transition-colors duration-300">Tableau de bord</span>
           </NuxtLink>
           <NuxtLink 
             to="/assistant" 
-            class="text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-full transition-all duration-200 text-muted-foreground hover:text-foreground"
-            active-class="bg-background text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-500/10 font-bold"
+            class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 relative group"
+            active-class="bg-background dark:bg-zinc-800 border-2 border-green-600 text-foreground dark:text-zinc-100 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-border/40 font-bold"
           >
-            Assistant IA
+            <span class="absolute inset-0 rounded-full bg-indigo-500/0 group-hover:bg-indigo-500/5 dark:group-hover:bg-indigo-400/5 transition-all duration-300 -z-10"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-muted-foreground group-[.router-link-active]:text-indigo-500 dark:group-[.router-link-active]:text-indigo-400 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+              <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z" />
+              <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z" />
+            </svg>
+            <span class="text-muted-foreground group-[.router-link-active]:text-foreground transition-colors duration-300">Assistant IA</span>
           </NuxtLink>
         </nav>
       </div>
