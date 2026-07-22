@@ -89,16 +89,49 @@
     <!-- Main Content Section -->
     <div class="space-y-4">
       <div class="flex items-center justify-between gap-4">
-        <div class="relative flex-1 max-w-sm">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div 
+          class="relative flex-1 max-w-md bg-zinc-100/80 dark:bg-zinc-900/60 border border-border/85 focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all duration-300 rounded-xl shadow-sm flex items-center"
+        >
+          <svg class="absolute left-3 w-4 h-4 text-muted-foreground pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
           </svg>
           <input
+            ref="searchInputRef"
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher une candidature..."
-            class="input-field pl-9 bg-muted/50 border-none h-9 text-xs"
+            @focus="isFocused = true"
+            @blur="isFocused = false"
+            class="w-full pl-9 pr-24 bg-transparent h-9 text-xs focus:outline-none placeholder-muted-foreground/60 font-medium"
           />
+          
+          <!-- Results Count Badge -->
+          <span 
+            v-if="searchQuery"
+            class="absolute right-9 text-[9px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-extrabold px-2 py-0.5 rounded-full shrink-0 animate-fade-in"
+          >
+            {{ filteredApplications.length }} {{ filteredApplications.length > 1 ? 'résultats' : 'résultat' }}
+          </span>
+
+          <!-- Clear Search Button -->
+          <button 
+            v-if="searchQuery"
+            @click="searchQuery = ''"
+            class="absolute right-3 text-muted-foreground hover:text-foreground transition-colors p-0.5"
+            title="Effacer la recherche"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          <!-- Keyboard Shortcut indicator -->
+          <kbd 
+            v-else-if="!isFocused"
+            class="absolute right-3 hidden sm:inline-flex h-5 select-none items-center gap-0.5 rounded border border-border/70 bg-background px-1.5 font-mono text-[9px] font-bold text-muted-foreground/75"
+          >
+            /
+          </kbd>
         </div>
         <button 
           @click="store.fetchApplications()" 
@@ -194,6 +227,9 @@ const editingApplication = ref<JobApplication | null>(null)
 const viewingApplication = ref<JobApplication | null>(null)
 const applicationToDelete = ref<JobApplication | null>(null)
 
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const isFocused = ref(false)
+
 const filteredApplications = computed(() => {
   let list = store.sortedApplications
 
@@ -229,8 +265,20 @@ function toggleFilter(status: string | null) {
   }
 }
 
+function handleKeyDown(e: KeyboardEvent) {
+  if (e.key === '/' && document.activeElement !== searchInputRef.value) {
+    e.preventDefault()
+    searchInputRef.value?.focus()
+  }
+}
+
 onMounted(() => {
   store.fetchApplications()
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
 })
 
 const user = useSupabaseUser()
