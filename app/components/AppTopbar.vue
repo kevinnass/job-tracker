@@ -45,6 +45,7 @@ const pageTitle = computed(() => {
   if (route.path === '/') return 'Tableau de bord'
   if (route.path === '/assistant') return 'Assistant IA'
   if (route.path === '/profile') return 'Mon Profil'
+  if (route.path === '/analytics') return 'Analyses'
   if (route.path === '/archive') return 'Candidatures Masquées'
   return 'JobTracker'
 })
