@@ -133,6 +133,22 @@
             /
           </kbd>
         </div>
+        
+        <!-- Hide Closed Toggle -->
+        <div class="flex items-center gap-2 px-3 h-9 bg-card border border-border/60 rounded-xl">
+          <button 
+            @click="hideClosed = !hideClosed"
+            class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+            :class="hideClosed ? 'bg-indigo-500' : 'bg-zinc-300 dark:bg-zinc-700'"
+            title="Masquer les candidatures acceptées et refusées"
+          >
+            <span 
+              class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              :class="hideClosed ? 'translate-x-4' : 'translate-x-0'"
+            />
+          </button>
+          <span class="text-[9.5px] font-bold text-muted-foreground select-none uppercase tracking-widest hidden sm:inline-block">Masquer les candidatures refusées</span>
+        </div>
         <button 
           @click="store.fetchApplications()" 
           class="flex items-center gap-2 h-9 px-3 hover:bg-muted border border-dashed rounded-lg transition-colors text-muted-foreground text-[10px] font-bold uppercase tracking-wider"
@@ -147,7 +163,6 @@
           Actualiser
         </button>
       </div>
- 
       <!-- Loading -->
       <div v-if="store.loading && !store.applications.length" class="flex items-center justify-center py-20 border border-dashed rounded-xl">
         <div class="flex flex-col items-center gap-3">
@@ -229,9 +244,15 @@ const applicationToDelete = ref<JobApplication | null>(null)
 
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const isFocused = ref(false)
+const hideClosed = ref(true)
 
 const filteredApplications = computed(() => {
   let list = store.sortedApplications
+
+  // Filter out closed applications if hideClosed is checked, unless explicitly filtering by status
+  if (hideClosed.value && activeFilter.value !== 'accepted' && activeFilter.value !== 'rejected') {
+    list = list.filter(app => app.status !== 'accepted' && app.status !== 'rejected')
+  }
 
   // Filter by status if a stat card is selected
   if (activeFilter.value) {
