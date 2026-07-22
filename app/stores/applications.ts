@@ -91,7 +91,11 @@ export const useApplicationsStore = defineStore('applications', () => {
         ...app,
         user_id: userId
       }
-      if (!payload.applied_at) payload.applied_at = null
+      if (payload.status !== 'draft' && !payload.applied_at) {
+        payload.applied_at = new Date().toISOString()
+      } else if (!payload.applied_at) {
+        payload.applied_at = null
+      }
 
       const { data, error: err } = await supabase
         .from('job_applications')
@@ -121,10 +125,19 @@ export const useApplicationsStore = defineStore('applications', () => {
     loading.value = true
     error.value = null
     try {
-      const payload = { 
+      const existing = applications.value.find(a => a.id === id)
+
+      const payload: any = { 
         ...updates, 
         user_id: userId,
         updated_at: new Date().toISOString() 
+      }
+
+      // Auto-set today's date if transitioning from draft (or missing applied_at) to applied / active status
+      if (payload.status && payload.status !== 'draft') {
+        if (!payload.applied_at && (!existing?.applied_at || existing?.status === 'draft')) {
+          payload.applied_at = new Date().toISOString()
+        }
       }
       
       const { data, error: err } = await supabase
