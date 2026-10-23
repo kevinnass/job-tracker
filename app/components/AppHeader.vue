@@ -176,6 +176,6 @@ function navigateToProfile() {
 async function logout() {
   showUserMenu.value = false
   await supabase.auth.signOut()
-  navigateTo('/login')
+  navigateTo('/')
 }
 </script>

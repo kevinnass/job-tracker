@@ -89,7 +89,7 @@
  * Page Configuration & Meta
  */
 definePageMeta({
-  layout: 'default'
+  layout: false
 })
 
 const locale = ref<'fr' | 'en'>('en')

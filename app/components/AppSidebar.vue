@@ -149,7 +149,7 @@ watch(() => route.path, () => {
 
 async function logout() {
   await supabase.auth.signOut()
-  navigateTo('/login')
+  navigateTo('/')
 }
 
 // Icon definitions
@@ -225,7 +225,7 @@ const IconAnalytics = () => h('svg', {
 
 const navItems = [
   { label: 'Tableau de bord', to: '/', icon: IconDashboard },
-  { label: 'Analyses', to: '/analytics', icon: IconAnalytics },
+  { label: 'Analytics', to: '/analytics', icon: IconAnalytics },
   { label: 'Assistant IA', to: '/assistant', icon: IconAssistant },
   { label: 'Mon Profil', to: '/profile', icon: IconProfile },
   { label: 'Masqués', to: '/archive', icon: IconArchive }

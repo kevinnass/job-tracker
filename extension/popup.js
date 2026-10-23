@@ -114,21 +114,56 @@ document.getElementById('scrape-btn').addEventListener('click', async () => {
     let aiData = null;
     try {
       const aiPromise = client.functions.invoke('analyze-job', {
-        body: { text: scrapeData.content }
+        body: { 
+          text: scrapeData.content,
+          title: scrapeData.title,
+          url: scrapeData.url
+        }
       });
-      const aiTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('IA Timeout')), 7000));
+      const aiTimeout = new Promise((_, rej) => setTimeout(() => rej(new Error('IA Timeout')), 15000));
       
       const { data, error: aiError } = await Promise.race([aiPromise, aiTimeout]);
       if (aiError) throw aiError;
       aiData = data;
     } catch (e) {
       console.warn('IA bypass:', e.message);
-      const parts = scrapeData.title.split(/ [|—-] /);
-      aiData = {
-        company_name: parts[1]?.trim() || parts[0]?.trim() || 'Inconnue',
-        job_profile: parts[0]?.trim() || 'Poste'
-      };
+      aiData = null;
     }
+
+    const cleanTitle = (scrapeData.title || '').replace(/^\(\d+\)\s*/, '');
+    let fallbackCompany = 'Inconnue';
+    let fallbackProfile = 'Poste';
+
+    const chezMatch = cleanTitle.match(/^(.+?)\s+chez\s+(.+)$/i);
+    if (chezMatch) {
+      fallbackProfile = chezMatch[1].trim();
+      fallbackCompany = chezMatch[2].replace(/\s*(?:\| LinkedIn|\| Welcome to the Jungle|\| HelloWork).*$/i, '').trim();
+    } else {
+      const parts = cleanTitle.replace(/\s*(?:\| LinkedIn|\| Welcome to the Jungle|\| HelloWork).*$/i, '').split(/\s*[-|–—•]\s*/);
+      if (parts.length >= 2) {
+        if (/(?:développeur|developer|engineer|ingénieur|consultant|architecte|lead|manager|tech|software|stage)/i.test(parts[0])) {
+          fallbackProfile = parts[0].trim();
+          fallbackCompany = parts[1].trim();
+        } else {
+          fallbackCompany = parts[0].trim();
+          fallbackProfile = parts[1].trim();
+        }
+      } else if (parts[0]) {
+        fallbackProfile = parts[0].trim();
+      }
+    }
+
+    const finalCompany = (aiData?.company_name && aiData.company_name.trim()) || fallbackCompany || 'Inconnue';
+    const finalProfile = (aiData?.job_profile && aiData.job_profile.trim()) || fallbackProfile || 'Poste';
+
+    // Format missions & skills cleanly if array or string
+    const formattedMissions = Array.isArray(aiData?.main_missions)
+      ? aiData.main_missions.join('\n')
+      : (aiData?.main_missions || '');
+    
+    const formattedSkills = Array.isArray(aiData?.primary_skills)
+      ? aiData.primary_skills.join(', ')
+      : (aiData?.primary_skills || '');
 
     // 5. DB Insert
     text.textContent = 'Sauvegarde (4/4)...';
@@ -136,15 +171,15 @@ document.getElementById('scrape-btn').addEventListener('click', async () => {
       .from('job_applications')
       .insert([{ 
         user_id: session.user.id,
-        company_name: aiData.company_name,
-        job_profile: aiData.job_profile,
+        company_name: finalCompany,
+        job_profile: finalProfile,
         url: scrapeData.url,
         status: currentStatus,
         applied_at: currentStatus === 'applied' ? new Date().toISOString() : null,
-        proposed_salary: aiData.proposed_salary || '',
-        primary_skills: aiData.primary_skills || '',
-        company_info: aiData.company_info || '',
-        main_missions: aiData.main_missions || `Analysé le ${new Date().toLocaleDateString()}\n\nTexte source:\n${scrapeData.content}`
+        proposed_salary: aiData?.proposed_salary || '',
+        primary_skills: formattedSkills,
+        company_info: aiData?.company_info || '',
+        main_missions: formattedMissions || `Descriptif à compléter`
       }]);
 
     if (dbError) throw dbError;
